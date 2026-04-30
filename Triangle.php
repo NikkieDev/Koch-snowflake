@@ -10,13 +10,22 @@ class Triangle
 		public readonly Point $c,
 	) {}
 
-	public function getCenterX()
+	public function getCenterX(): float
 	{
 		return ($this->a->x + $this->b->x + $this->c->x) / 3;
 	}
 
-	public function getCenterY()
+	public function getCenterY(): float
 	{
 		return ($this->a->y + $this->b->y + $this->c->y) / 3;
+	}
+
+	public function getEdges(): array
+	{
+		return [
+			new Line($this->a, $this->b),
+			new Line($this->a, $this->c),
+			new Line($this->b, $this->c)
+		];
 	}
 }

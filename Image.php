@@ -1,11 +1,12 @@
 <?php
 
 include_once 'Point.php';
+include_once 'Line.php';
 
 class Image
 {
 	private $image;
-	private int $white, $black;
+	public int $white, $black, $special;
 
 	public function __construct(
 		public readonly int $size,
@@ -14,6 +15,7 @@ class Image
 		$this->image = imagecreatetruecolor($size, $size);
 		$this->white = imagecolorallocate($this->image, 255, 255, 255);
 		$this->black = imagecolorallocate($this->image, 0, 0, 0);
+		$this->special = imagecolorallocate($this->image, 255, 0, 128);
 
 		imagefill($this->image, 0, 0, $this->black);
 	}
@@ -22,6 +24,10 @@ class Image
 	 * <summary>
 	 * return center of self in cartesic coordinates
 	 * </summary>
+	 *
+	 * <algo>
+	 * Create a new point with X & Y both being half the $size of this object
+	 * </algo>
 	 */
 	public function getCenter(): Point
 	{
@@ -38,7 +44,7 @@ class Image
 	 * and X & Y of $b as end destination
 	 * </algo>
 	 */
-	public function drawLine(Point $a, Point $b): void
+	public function drawLine(Point $a, Point $b, int $color = 16777215): Line
 	{
 		imageline(
 			$this->image,
@@ -46,8 +52,10 @@ class Image
 			$a->y,
 			$b->x,
 			$b->y,
-			$this->white
+			$color
 		);
+
+		return new Line($a, $b);
 	}
 
 	/**
