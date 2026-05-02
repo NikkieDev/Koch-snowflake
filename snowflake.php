@@ -1,5 +1,5 @@
 <?php
-
+ini_set('memory_limit', '4096M');
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
 
 include_once 'Image.php';
@@ -18,8 +18,10 @@ $baseAngle = deg2rad(60);
 
 $image = new Image($imageSize);
 
-$vertexA = new Point(rand(0, $imageSize - 400), rand(0, $imageSize - 400));
-$vertexB = new Point(rand(0, $imageSize - 400), rand(0, $imageSize - 400));
+//$vertexA = new Point(rand(0, $imageSize - 400), rand(0, $imageSize - 400));
+//$vertexB = new Point(rand(0, $imageSize - 400), rand(0, $imageSize - 400));
+$vertexA = new Point(550, 750);
+$vertexB = new Point(750, 550);
 $edgeAB = new Line($vertexA, $vertexB);
 
 if ($iterations < 1) {
@@ -43,7 +45,6 @@ if ($iterations < 2) {
 }
 
 $iterationEdges = $firstIteration->getEdges();
-
 for ($i = 2; $i <= $iterations; $i++) {
 	$nextIteration = [];
 
@@ -60,17 +61,27 @@ for ($i = 2; $i <= $iterations; $i++) {
 
 		$edgeDE = new Line($vertexD, $vertexE);
 
-		$cross = ($edge->b->x - $edge->a->x) * ($firstIteration->getCenterY() - $edge->a->y)
-			   - ($edge->b->y - $edge->a->y) * ($firstIteration->getCenterX() - $edge->a->x);
+        $vertexFPositive = new Point(
+            $vertexD->x + cos($edgeDE->getAngle() + $baseAngle)*$edgeDE->getDistance(),
+            $vertexD->y + sin($edgeDE->getAngle() + $baseAngle)*$edgeDE->getDistance()
+        );
 
-		$angle = $cross > 0
-			? $edgeDE->getAngle() - $baseAngle
-			: $edgeDE->getAngle() + $baseAngle;
+        $vertexFNegative = new Point(
+            $vertexD->x + cos($edgeDE->getAngle() - $baseAngle)*$edgeDE->getDistance(),
+            $vertexD->y + sin($edgeDE->getAngle() - $baseAngle)*$edgeDE->getDistance()
+        );
 
-		$vertexF = new Point(
-			$vertexD->x + cos($angle) * $edgeDE->getDistance(),
-			$vertexD->y + sin($angle) * $edgeDE->getDistance(),
-		);
+        $distanceFromCenterPositive = sqrt(
+            pow($vertexFPositive->x - $firstIteration->getCenterX(), 2)
+            + pow($vertexFPositive->y - $firstIteration->getCenterY(), 2)
+        );
+
+        $distanceFromCenterNegative = sqrt(
+            pow($vertexFNegative->x - $firstIteration->getCenterX(), 2)
+            + pow($vertexFNegative->y - $firstIteration->getCenterY(), 2)
+        );
+
+        $vertexF = $distanceFromCenterPositive > $distanceFromCenterNegative ? $vertexFPositive : $vertexFNegative;
 
 		$nextIteration[] = new Line($edge->a, $vertexD);
 		$nextIteration[] = new Line($vertexD, $vertexF);
