@@ -13,11 +13,11 @@ header('Content-Type: image/png');
 
 $iterations = isset($_GET['iterations']) ? (int) $_GET['iterations'] : 2;
 
-$imageSize = 1200;
+$imageSize = 3200;
 $image = new Image($imageSize);
 
-$vertexA = new Point(550, 750);
-$vertexB = new Point(750, 550);
+$vertexA = new Point(750, 750);
+$vertexB = new Point(1800, 2000);
 $edgeAB = new Line($vertexA, $vertexB);
 
 if ($iterations < 1) {
@@ -25,18 +25,20 @@ if ($iterations < 1) {
 	return $image->render();
 }
 
-$vertexC = $vertexA->turn($edgeAB->getAngle(), $edgeAB->getDistance());
+$vertexC = $vertexA->turn($edgeAB->getAngle() + deg2rad(60), $edgeAB->getDistance());
 
 $lineList = new LineList(new LineNode($edgeAB));
 $lineList->add(new LineNode(new Line($vertexB, $vertexC)));
-$lineList->add(new LineNode(new Line($vertexA, $vertexC)));
+$lineList->add(new LineNode(new Line($vertexC, $vertexA)));
 
-// BROKEN
-$lineList->addChildren();
+
+for ($i = 2; $i <= $iterations; $i++) {
+	$lineList->addChildren();
+}
 
 /** @var Line $line */
 foreach ($lineList->readAll() as $line) {
 	$image->drawLine($line->a, $line->b);
-}
+};
 
 return $image->render();

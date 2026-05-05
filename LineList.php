@@ -17,42 +17,53 @@ class LineList
 		$current->n = $ln;
 	}
 
-	/** DOESNT WORK YET **/
 	public function addChildren(): void
 	{
 		$current = $this->head;
+		$prev = null;
+		$baseAngle = deg2rad(60);
 
 		while ($current !== null) {
 			$next = $current->n;
-			if (!$current->hasChildren) {
-				$a = $current->payload->a;
-				$b = $current->payload->b;
-				$edge = $current->payload;
+			$edge = $current->payload;
 
-				$vertexD = new Point(
-					$a->x + cos($edge->getAngle()) * $edge->getDistance()/3,
-					$a->y + sin($edge->getAngle()) * $edge->getDistance()/3
-				);
+			$d = new Point(
+				$edge->a->x + cos($edge->getAngle()) * $edge->getDistance()/3,
+				$edge->a->y + sin($edge->getAngle()) * $edge->getDistance()/3,
+			);
 
-				$vertexE = new Point(
-					$a->x + cos($edge->getAngle()) * $edge->getDistance()/3*2,
-					$a->y + sin($edge->getAngle()) * $edge->getDistance()/3*2
-				);
+			$e = new Point(
+				$edge->a->x + cos($edge->getAngle()) * $edge->getDistance()/3*2,
+				$edge->a->y + sin($edge->getAngle()) * $edge->getDistance()/3*2,
+			);
 
-				$vertexF = $vertexD->turn(0, $edge->getDistance()/3);
+			$edgeDE = new Line($d, $e);
 
-				$node = new LineNode(new Line($vertexD, $vertexF));
-				$node2 = new LineNode(new Line($vertexF, $vertexE));
+			$f = new Point(
+				$d->x + cos(($edgeDE->getAngle() - $baseAngle)) * $edgeDE->getDistance(),
+				$d->y + sin(($edgeDE->getAngle() - $baseAngle)) * $edgeDE->getDistance(),
+			);
 
-				$node->n = $node2;
-				$node2->n = $next;
-				$current->n = $node;
-				$current->hasChildren = true;
+			$n1 = new LineNode(new Line($edge->a, $d));
+			$n2 = new LineNode(new Line($d, $f));
+			$n3 = new LineNode(new Line($f, $e));
+			$n4 = new LineNode(new Line($e, $edge->b));
 
-				$current = $next;
+			$n1->n = $n2;
+			$n2->n = $n3;
+			$n3->n = $n4;
+			$n4->n = $next;
+
+			if ($prev === null) {
+				$this->head = $n1;
+			} else {
+				$prev->n = $n1;
 			}
+
+			$prev = $n4;
+			$current = $next;
 		}
-	}
+	}	
 
 	public function readAll(): array
 	{
