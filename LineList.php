@@ -21,29 +21,18 @@ class LineList
 	{
 		$current = $this->head;
 		$prev = null;
-		$baseAngle = deg2rad(60);
 
 		while ($current !== null) {
 			$next = $current->n;
 			$edge = $current->payload;
 
-			$d = new Point(
-				$edge->a->x + cos($edge->getAngle()) * $edge->getDistance()/3,
-				$edge->a->y + sin($edge->getAngle()) * $edge->getDistance()/3,
-			);
-
-			$e = new Point(
-				$edge->a->x + cos($edge->getAngle()) * $edge->getDistance()/3*2,
-				$edge->a->y + sin($edge->getAngle()) * $edge->getDistance()/3*2,
-			);
+			$d = $edge->a->turn($edge->getAngle(), $edge->getDistance()/3);
+			$e = $edge->a->turn($edge->getAngle(), $edge->getDistance()/3*2);
 
 			$edgeDE = new Line($d, $e);
 
-			$f = new Point(
-				$d->x + cos(($edgeDE->getAngle() - $baseAngle)) * $edgeDE->getDistance(),
-				$d->y + sin(($edgeDE->getAngle() - $baseAngle)) * $edgeDE->getDistance(),
-			);
-
+			$f = $d->turn($edgeDE->getAngle() - deg2rad(60), $edgeDE->getDistance());
+;
 			$n1 = new LineNode(new Line($edge->a, $d));
 			$n2 = new LineNode(new Line($d, $f));
 			$n3 = new LineNode(new Line($f, $e));

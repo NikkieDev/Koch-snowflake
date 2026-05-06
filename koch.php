@@ -16,8 +16,8 @@ $iterations = isset($_GET['iterations']) ? (int) $_GET['iterations'] : 2;
 $imageSize = 3200;
 $image = new Image($imageSize);
 
-$vertexA = new Point(750, 750);
-$vertexB = new Point(1800, 2000);
+$vertexA = new Point(1150, 550);
+$vertexB = new Point(2200, 2000);
 $edgeAB = new Line($vertexA, $vertexB);
 
 if ($iterations < 1) {
